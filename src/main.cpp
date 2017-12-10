@@ -8,6 +8,7 @@
 #include "Eigen-3.3/Eigen/Core"
 #include "Eigen-3.3/Eigen/QR"
 #include "json.hpp"
+#include "spline.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ using json = nlohmann::json;
 constexpr double pi() { return M_PI; }
 double deg2rad(double x) { return x * pi() / 180; }
 double rad2deg(double x) { return x * 180 / pi(); }
+double meters_per_second(double mph) { return (mph / 3600) * 1609.34; }
 
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
@@ -220,8 +222,8 @@ int main() {
           	double car_y = j[1]["y"];
           	double car_s = j[1]["s"];
           	double car_d = j[1]["d"];
-          	double car_yaw = j[1]["yaw"];
-          	double car_speed = j[1]["speed"];
+          	double car_yaw = deg2rad(j[1]["yaw"]);
+          	double car_speed = meters_per_second(j[1]["speed"]);
 
           	// Previous path data given to the Planner
           	auto previous_path_x = j[1]["previous_path_x"];
@@ -238,6 +240,34 @@ int main() {
           	vector<double> next_x_vals;
           	vector<double> next_y_vals;
 
+            cout << "previous path: " << previous_path_x.size() << endl;
+
+            int target_path_size = 10;
+            int prev_size = 0;
+            /*
+            int prev_size = previous_path_x.size();
+            */
+
+            // copy some amount of x,y from unused previous path
+            for (int i = 0; i < prev_size; i++) {
+                next_x_vals.push_back(previous_path_x[i]);
+                next_y_vals.push_back(previous_path_y[i]);
+            }
+
+            int lane = 2;
+            double dist_inc = 0.44;
+
+            //changes direction too sharply, smooth path (spline)
+            //speed changes too quicklky
+            for (int i = 0; i < target_path_size - prev_size; i++) {
+                double next_s = car_s + (i + 1) * dist_inc;
+                double next_d = 2 + (lane * 4);
+                vector<double> xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+                //printf("speed: %f, x: %f, y: %f, s: %f, d: %f\n", car_speed, xy[0], xy[1], s, d);
+
+                next_x_vals.push_back(xy[0]);
+                next_y_vals.push_back(xy[1]);
+            }
 
           	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
           	msgJson["next_x"] = next_x_vals;
