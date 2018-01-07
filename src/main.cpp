@@ -252,12 +252,7 @@ int main() {
 				car_s = end_path_s;
 			}
 
-			//bool too_close = false;
-
-			//int min_lane = 2 + 4 * lane - 2;
-			//int max_lane = 2 + 4 * lane + 2;
-
-			// 3 slots (L,S,R) predicted around our car at end of previous path
+			// predict which lanes will have cars at the end path point in time
 			bool lanes[3] = {};
 
 			for (int i = 0; i < sensor_fusion.size(); i++) {
@@ -289,7 +284,8 @@ int main() {
 				}
 			}
 
-			cout << target_velocity << " " << lane << " lanes: " << lanes[0] << ", " << lanes[1] << ", " << lanes[2] << endl;
+			//cout << target_velocity << " " << lane << " lanes: " << lanes[0] << ", " << lanes[1] << ", " << lanes[2] << endl;
+			// simple behavior planning to change lanes or slow down.
 			if (lanes[lane]) {
 				if (lane > 0 && !lanes[lane - 1]) { // needs to be any lane to the left
 					lane -= 1;
@@ -302,18 +298,11 @@ int main() {
 				target_velocity += velocity_inc;
 			}
 
-			/*
-			if (too_close) {
-				target_velocity -= velocity_inc;
-			} else if (target_velocity < speed_limit) {
-				target_velocity += velocity_inc;
-			}
-			*/
-
 			if (target_velocity < 0) {
 				target_velocity = 0;
 			}
 
+			// create a spline for the trajectory
 			vector<double> ptsx;
 			vector<double> ptsy;
 
@@ -382,6 +371,7 @@ int main() {
 
 			double x_add_on = 0;
 
+			// Use the spline to generate waypoints
 			for (int i = 1; i <= target_path_size - prev_size; i++) {
 				double N = target_dist/(0.02*target_velocity);
 				double x_point = x_add_on + target_x/N;
