@@ -241,10 +241,13 @@ int main() {
 
           	json msgJson;
 
-			double velocity_inc = 0.05;
-			double speed_limit = 22 - 2*velocity_inc;
+			double velocity_inc = 0.1;
+			double speed_limit = 22 - velocity_inc;
 
-            int target_path_size = 50;
+            int target_path_size = 30;
+			int free_lane_gap = 20;
+			// speed of close car ahead in same lane
+			double follow_speed = 0;
 
             int prev_size = previous_path_x.size();
 
@@ -267,19 +270,26 @@ int main() {
 				check_car_s += prev_size * 0.02 * check_speed;
 
 				double relative_s = check_car_s - end_path_s;
-				if (relative_s > -20 && relative_s < 20) {
+				if (relative_s > -free_lane_gap/2 && relative_s < free_lane_gap) {
 					//cout << "check_car_d[" << i << "]: " << check_car_d << endl;
+					int check_lane = -1;
 					if (check_car_d < 4) {
 						// left
-						lanes[0] = true;
+						check_lane = 0;
 					} else if (check_car_d > 4 && check_car_d < 8) {
 						// center
-						lanes[1] = true;
+						check_lane = 1;
 					} else if (check_car_d > 8) {
 						// right
-						lanes[2] = true;
+						check_lane = 2;
 					} else {
 						cout << "XXX Unknown lane!!!" << endl;
+					}
+
+					lanes[check_lane] = true;
+
+					if (check_lane == lane) {
+						follow_speed = check_speed;
 					}
 				}
 			}
@@ -291,7 +301,7 @@ int main() {
 					lane -= 1;
 				} else if (lane < 2 && !lanes[lane + 1]) {
 					lane += 1;
-				} else {
+				} else if (follow_speed && target_velocity > follow_speed) {
 					target_velocity -= velocity_inc;
 				}
 			} else if (target_velocity < speed_limit) {
