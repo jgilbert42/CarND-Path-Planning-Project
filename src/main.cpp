@@ -248,7 +248,8 @@ int main() {
             int target_path_size = 30;
 			// space around the ego vehicle to identify other cars that block
 			// the lane
-			int free_lane_gap = 20;
+			int max_free_lane_gap = 30;
+			int min_free_lane_gap = -10;
 			// speed of close car ahead in same lane
 			double follow_speed = 0;
 
@@ -273,7 +274,7 @@ int main() {
 				check_car_s += prev_size * 0.02 * check_speed;
 
 				double relative_s = check_car_s - end_path_s;
-				if (relative_s > -free_lane_gap/2 && relative_s < free_lane_gap) {
+				if (relative_s > min_free_lane_gap && relative_s < max_free_lane_gap) {
 					//cout << "check_car_d[" << i << "]: " << check_car_d << endl;
 					int check_lane = -1;
 					if (check_car_d < 4) {
