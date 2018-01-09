@@ -244,7 +244,10 @@ int main() {
 			double velocity_inc = 0.1;
 			double speed_limit = 22 - velocity_inc;
 
+			// total number of waypoints sent to the simulator
             int target_path_size = 30;
+			// space around the ego vehicle to identify other cars that block
+			// the lane
 			int free_lane_gap = 20;
 			// speed of close car ahead in same lane
 			double follow_speed = 0;

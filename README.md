@@ -1,10 +1,18 @@
 # Reflection
 The implementation has three major parts: prediction, behavior planning, and
-trajectory generation.  The prediction phase uses the sensor fusion data to
-estimate which lanes will have cars at the end of the previous path.  The
-behavior planning uses the predictions to decide to change lanes or slow down.
-Finally, the trajectory is generated using a spline created from the end of the
-previous path and waypoints 30, 60, and 90 meters along the map route.
+trajectory generation.
+
+The prediction phase uses the sensor fusion data to
+estimate which lanes will have cars when the ego car is at the end of the
+previous path.  If the ego car lane is blocked, the prefence is to pass the car
+on the left and if unavailable the right.  If there's no immediate path to
+pass, the speed of the blocking car is matched until a passing lane becomes
+available.
+
+The behavior planning uses the predictions to decide to change
+lanes or slow down.  Finally, the trajectory is generated using a spline
+created from the end of the previous path and waypoints 30, 60, and 90 meters
+along the map route.
 
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
