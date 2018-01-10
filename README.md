@@ -9,10 +9,10 @@ on the left and if unavailable the right.  If there's no immediate path to
 pass, the speed of the blocking car is matched until a passing lane becomes
 available.
 
-The behavior planning uses the predictions to decide to change
-lanes or slow down.  Finally, the trajectory is generated using a spline
-created from the end of the previous path and waypoints 30, 60, and 90 meters
-along the map route.
+The behavior planning uses the predictions to decide to change lanes or slow
+down depending available lane space.  Finally, the trajectory is generated
+using a spline created from the end of the previous path and waypoints 30, 60,
+and 90 meters along the map route.
 
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
